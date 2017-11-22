@@ -2,7 +2,7 @@ package speaker
 
 import javax.sound.sampled._
 
-class MyAudioPlayer(audioStream: AudioInputStream, initialGain: Int, whenDone: MyAudioPlayer => Unit) extends LineListener {
+class AudioPlayer(audioStream: AudioInputStream, initialGain: Int, whenDone: AudioPlayer => Unit) extends LineListener {
   var playCompleted = false
   val format = audioStream.getFormat
   val defaultFormat = new AudioFormat(44100, 16, 2, true, true)
@@ -23,7 +23,7 @@ class MyAudioPlayer(audioStream: AudioInputStream, initialGain: Int, whenDone: M
     audioClip.close()
   }
 
-  def play(): MyAudioPlayer = {
+  def play(): AudioPlayer = {
     try {
       audioClip.setFramePosition(0)
       audioClip.start()
