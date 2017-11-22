@@ -2,13 +2,17 @@ package speaker
 
 import javax.sound.sampled._
 
-class AudioPlayer(audioStream: AudioInputStream, initialGain: Int, whenDone: AudioPlayer => Unit) extends LineListener {
+class MyAudioPlayer(audioStream: AudioInputStream, initialGain: Int, whenDone: MyAudioPlayer => Unit) extends LineListener {
   var playCompleted = false
   val format = audioStream.getFormat
-  val info = new DataLine.Info(classOf[Clip], format)
+  val defaultFormat = new AudioFormat(44100, 16, 2, true, true)
+  val info = new DataLine.Info(classOf[Clip], defaultFormat)
   val audioClip = AudioSystem.getLine(info).asInstanceOf[Clip]
-  audioClip.open(audioStream)
 
+  import javax.sound.sampled.AudioSystem
+
+  val currentAudioStream = AudioSystem.getAudioInputStream(defaultFormat, audioStream)
+  audioClip.open(currentAudioStream)
   audioClip.addLineListener(this)
   val masterGain = audioClip.getControl(FloatControl.Type.MASTER_GAIN).asInstanceOf[FloatControl]
   gain(initialGain)
@@ -19,7 +23,7 @@ class AudioPlayer(audioStream: AudioInputStream, initialGain: Int, whenDone: Aud
     audioClip.close()
   }
 
-  def play(): AudioPlayer = {
+  def play(): MyAudioPlayer = {
     try {
       audioClip.setFramePosition(0)
       audioClip.start()
