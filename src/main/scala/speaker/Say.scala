@@ -1,8 +1,8 @@
 package speaker
 
-import java.io.{ByteArrayOutputStream, InputStream, OutputStream}
+import java.io.{ByteArrayOutputStream, FileOutputStream, InputStream, OutputStream}
 import java.util.Locale
-import javax.sound.sampled.AudioInputStream
+import javax.sound.sampled.{AudioFileFormat, AudioInputStream, AudioSystem}
 
 import akka.actor.{Actor, ActorLogging, Props}
 import akka.pattern.ask
@@ -10,7 +10,11 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.{HttpApp, Route}
 import marytts.LocalMaryInterface
 import speaker.WebServer.Speaker.Say
+import sun.audio.AudioPlayer
 
+/**
+  * Example: curl -X POST -H "Content-Type: text/plain" --data "this is raw data" http://localhost:9100/say
+  */
 object CopyStreams {
   type Bytes = Int
   def apply(input: InputStream, output: ByteArrayOutputStream, chunkSize: Bytes = 1024) = {
@@ -29,7 +33,8 @@ object WebServer extends HttpApp {
   class Speaker extends Actor with ActorLogging {
     override def receive: Receive = {
       case Say(text) =>
-        sender ! marytts.generateAudio(text)
+        val audioStream = marytts.generateAudio(text)
+        sender ! audioStream
     }
   }
 
@@ -47,9 +52,11 @@ object WebServer extends HttpApp {
       post {
         entity(as[String]) { body =>
           onSuccess((speaker ? Say(body)).mapTo[AudioInputStream]) { audioStream =>
-            complete(
-              HttpEntity(ContentTypes.`application/octet-stream`, CopyStreams(audioStream,new ByteArrayOutputStream()).toByteArray)
-            )
+            complete {
+              val wave = new ByteArrayOutputStream()
+              AudioSystem.write(audioStream, AudioFileFormat.Type.WAVE, wave)
+              HttpEntity(wave.toByteArray)
+            }
           }
         }
       }
