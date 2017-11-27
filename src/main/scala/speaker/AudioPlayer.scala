@@ -24,7 +24,6 @@ class AudioPlayer(audioStream: AudioInputStream, initialGain: Int, whenDone: Aud
   }
 
   def play(): AudioPlayer = {
-    println("playing...")
     try {
       audioClip.setFramePosition(0)
       audioClip.start()

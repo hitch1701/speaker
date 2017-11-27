@@ -15,16 +15,6 @@ import sun.audio.AudioPlayer
 /**
   * Example: curl -X POST -H "Content-Type: text/plain" --data "this is raw data" http://localhost:9100/say
   */
-object CopyStreams {
-  type Bytes = Int
-  def apply(input: InputStream, output: ByteArrayOutputStream, chunkSize: Bytes = 1024) = {
-    val buffer = Array.ofDim[Byte](chunkSize)
-    var count = -1
-    while ({count = input.read(buffer); count > 0})
-      output.write(buffer, 0, count)
-    output
-  }
-}
 
 object WebServer extends HttpApp {
   val marytts = new LocalMaryInterface
@@ -32,9 +22,7 @@ object WebServer extends HttpApp {
 
   class Speaker extends Actor with ActorLogging {
     override def receive: Receive = {
-      case Say(text) =>
-        val audioStream = marytts.generateAudio(text)
-        sender ! audioStream
+      case Say(text) => sender ! marytts.generateAudio(text)
     }
   }
 
@@ -65,6 +53,6 @@ object WebServer extends HttpApp {
 
 
 object Process extends App {
-  println("Speaker version 0.0.0")
+  println("Speaker version 0.1.0")
   WebServer.startServer("localhost", 9100)
 }
