@@ -6,7 +6,9 @@ import akka.http.scaladsl.model.HttpEntity
 import akka.http.scaladsl.server.{HttpApp, Route}
 import speaker.WebServer.Speaker.Say
 
-
+/**
+  * Example: curl -X POST -H "Content-Type: text/plain" --data "this is raw data" http://localhost:9100/say
+  */
 
 object WebServer extends HttpApp {
 
