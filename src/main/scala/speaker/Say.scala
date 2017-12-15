@@ -53,6 +53,6 @@ object WebServer extends HttpApp {
 
 
 object Process extends App {
-  println("Speaker version 0.1.0")
+  println("Speaker version 0.1.1")
   WebServer.startServer("0.0.0.0", 9100)
 }
