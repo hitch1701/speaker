@@ -14,6 +14,7 @@ import sun.audio.AudioPlayer
 
 /**
   * Example: curl -X POST -H "Content-Type: text/plain" --data "this is raw data" http://localhost:9100/say
+  * Example: curl -X POST -H "Content-Type: text/plain" --data "Hello how are you? Am 29.12.2017 haben wir noch nichts geplant" http://localhost:9100/say
   */
 
 object WebServer extends HttpApp {
